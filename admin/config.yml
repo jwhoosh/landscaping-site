@@ -2,12 +2,14 @@ backend:
   name: github
   repo: jwhoosh/landscaping-site
   branch: main
+  auth_endpoint: https://auth.decapcms.org/auth
 
 media_folder: "img"
 public_folder: "/img"
 
-collections:
+publish_mode: editorial_workflow
 
+collections:
   - name: "homepage"
     label: "Homepage"
     files:
@@ -27,7 +29,7 @@ collections:
     fields:
       - { label: "Service Title", name: "title", widget: "string" }
       - { label: "Description", name: "body", widget: "text" }
-      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Image", name: "image", widget: "image", required: false }
 
   - name: "reviews"
     label: "Reviews"
@@ -47,10 +49,3 @@ collections:
         fields:
           - { label: "Our Story", name: "story", widget: "text" }
           - { label: "Commitment", name: "commitment", widget: "text" }
-
-
-    backend:
-  name: github
-  repo: jwhoosh/landscaping-site
-  branch: main
-  auth_type: implicit
