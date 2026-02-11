@@ -1,2 +1,54 @@
+backend:
+  name: github
+  repo: jwhoosh/landscaping-site
+  branch: main
+  base_url: https://decap-oauth.jwhoosh.workers.dev
+  auth_endpoint: auth
+
+# Where uploads go
 media_folder: "assets/img/uploads"
 public_folder: "/assets/img/uploads"
+
+# Recommended
+publish_mode: editorial_workflow
+
+collections:
+  - name: "homepage"
+    label: "Homepage"
+    files:
+      - file: "data/homepage.json"
+        label: "Homepage Content"
+        name: "homepage"
+        fields:
+          - { label: "Hero Title", name: "hero_title", widget: "string" }
+          - { label: "Hero Subtitle", name: "hero_sub", widget: "text" }
+          - { label: "CTA Button Text", name: "cta_text", widget: "string" }
+
+  - name: "services"
+    label: "Services"
+    folder: "data/services"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Service Title", name: "title", widget: "string" }
+      - { label: "Description", name: "body", widget: "text" }
+      - { label: "Image", name: "image", widget: "image", required: false }
+
+  - name: "reviews"
+    label: "Reviews"
+    folder: "data/reviews"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Review Text", name: "text", widget: "text" }
+      - { label: "Location", name: "location", widget: "string" }
+
+  - name: "about"
+    label: "About Page"
+    files:
+      - file: "data/about.json"
+        label: "About Content"
+        name: "about"
+        fields:
+          - { label: "Our Story", name: "story", widget: "text" }
+          - { label: "Commitment", name: "commitment", widget: "text" }
