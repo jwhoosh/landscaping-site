@@ -3,6 +3,10 @@ backend:
   repo: jwhoosh/landscaping-site
   branch: main
 
+  # IMPORTANT: use your Cloudflare Worker OAuth (NOT Netlify)
+  base_url: https://decap-oauth.jwhoosh.workers.dev
+  auth_endpoint: auth
+
 media_folder: "img"
 public_folder: "/img"
 
@@ -34,7 +38,7 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
-      - { label: "Review Text", name: "body", widget: "text" }
+      - { label: "Review Text", name: "text", widget: "text" }
       - { label: "Location", name: "location", widget: "string" }
 
   - name: "about"
