@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UrbanLeaf CMS</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Content Manager</title>
   </head>
   <body>
-    <!-- REQUIRED: Decap mounts here -->
+    <!-- Decap needs this root element -->
     <div id="nc-root"></div>
 
-    <!-- Decap CMS -->
+    <!-- IMPORTANT: Do NOT include netlify-identity-widget on Cloudflare Pages -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   </body>
 </html>
