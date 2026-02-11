@@ -5,12 +5,8 @@ backend:
   base_url: https://decap-oauth.jwhoosh.workers.dev
   auth_endpoint: auth
 
-# Where uploads go
 media_folder: "assets/img/uploads"
 public_folder: "/assets/img/uploads"
-
-# Recommended
-publish_mode: editorial_workflow
 
 collections:
   - name: "homepage"
