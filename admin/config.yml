@@ -3,9 +3,12 @@ backend:
   repo: jwhoosh/landscaping-site
   branch: main
 
-  # IMPORTANT: use your Cloudflare Worker OAuth (NOT Netlify)
+  # Use External OAuth (Cloudflare Worker)
   base_url: https://decap-oauth.jwhoosh.workers.dev
   auth_endpoint: auth
+
+  # IMPORTANT: tells Decap NOT to use Netlify auth
+  auth_type: implicit
 
 media_folder: "img"
 public_folder: "/img"
