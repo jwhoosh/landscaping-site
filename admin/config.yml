@@ -47,3 +47,10 @@ collections:
         fields:
           - { label: "Our Story", name: "story", widget: "text" }
           - { label: "Commitment", name: "commitment", widget: "text" }
+
+
+    backend:
+  name: github
+  repo: jwhoosh/landscaping-site
+  branch: main
+  auth_type: implicit
