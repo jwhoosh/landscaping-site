@@ -1,10 +1,8 @@
-// ✅ Put your Apps Script Web App URL here
+// ✅ PUT YOUR WORKING APPS SCRIPT WEB APP URL HERE:
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwPpHZYDCjZBQNKSisGfjNkv6u0hTU7QW5XQyPGFoZcOWyCOSx3AdfJ19-4KGXLTELO/exec";
 
-function qs(sel) {
-  return document.querySelector(sel);
-}
+function qs(sel) { return document.querySelector(sel); }
 
 function setMsg(el, text, ok = true) {
   if (!el) return;
@@ -18,41 +16,40 @@ function initYear() {
   if (y) y.textContent = new Date().getFullYear();
 }
 
-async function postLead(payloadObj) {
-  // Send as TEXT to avoid CORS preflight issues with Apps Script
-  const body = JSON.stringify(payloadObj);
+/**
+ * ✅ NEW: Load CMS content from /data/homepage.json and inject into homepage.
+ * This is why Decap edits will show on the public site.
+ */
+async function initHomepageContent() {
+  const titleEl = qs("#heroTitle");
+  const subEl = qs("#heroSub");
+  const ctaEl = qs("#ctaBtn");
 
-  // Attempt normal fetch first (lets you read response when allowed)
+  // If these elements don't exist, you're not on the homepage (or IDs missing).
+  if (!titleEl && !subEl && !ctaEl) return;
+
   try {
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body,
-      redirect: "follow",
-    });
+    // Cache-buster so you don't get an old JSON
+    const url = `/data/homepage.json?cb=${Date.now()}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to fetch homepage.json (${res.status})`);
 
-    // If we can read it, check for {success:true}
-    const txt = await res.text().catch(() => "");
-    try {
-      const j = JSON.parse(txt);
-      if (j && j.success === true) return true;
-    } catch (_) {
-      // If response isn't JSON but status is OK, treat as success
+    const data = await res.json();
+
+    if (titleEl && typeof data.hero_title === "string" && data.hero_title.trim()) {
+      titleEl.textContent = data.hero_title.trim();
     }
 
-    if (res.ok) return true;
-    throw new Error(`HTTP ${res.status} ${txt}`);
-  } catch (err) {
-    // Fallback: no-cors mode (browser won't block, but we can't read response)
-    await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body,
-    });
+    if (subEl && typeof data.hero_sub === "string") {
+      subEl.textContent = data.hero_sub.trim();
+    }
 
-    // Can't verify, but request was sent.
-    return true;
+    if (ctaEl && typeof data.cta_text === "string" && data.cta_text.trim()) {
+      ctaEl.textContent = data.cta_text.trim();
+    }
+  } catch (err) {
+    // Don’t break the page if JSON is missing; just log it.
+    console.warn("Homepage CMS content not loaded:", err);
   }
 }
 
@@ -67,11 +64,10 @@ function initLeadForm() {
     const fd = new FormData(form);
     const data = Object.fromEntries(fd.entries());
 
-    // Checkbox returns "on" if checked; make it explicit
-    const consentChecked =
-      form.querySelector('input[name="consent"]')?.checked === true;
+    // checkbox returns "on" if checked; make it explicit
+    data.consent = form.querySelector('input[name="consent"]')?.checked === true;
 
-    if (!consentChecked) {
+    if (!data.consent) {
       setMsg(msg, "Please tick consent to proceed.", false);
       return;
     }
@@ -79,27 +75,36 @@ function initLeadForm() {
     setMsg(msg, "Sending…", true);
 
     try {
-      const ok = await postLead({
-        name: (data.name || "").trim(),
-        phone: (data.phone || "").trim(),
-        location: (data.location || "").trim(),
-        service: (data.service || "").trim(),
-        notes: (data.notes || "").trim(),
-        consent: true,
-        source: "website",
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Apps Script + CORS can be picky; keep payload simple
+        body: JSON.stringify({
+          name: data.name || "",
+          phone: data.phone || "",
+          location: data.location || "",
+          service: data.service || "",
+          notes: data.notes || ""
+        })
       });
 
-      if (!ok) throw new Error("Server did not confirm success.");
+      const txt = await res.text();
+      let ok = false;
+
+      try {
+        const j = JSON.parse(txt);
+        ok = j && j.success === true;
+      } catch (_) {
+        ok = res.ok; // fallback
+      }
+
+      if (!ok) throw new Error(`Server did not confirm success: ${txt}`);
 
       form.reset();
       setMsg(msg, "✅ Request sent. We’ll contact you within 24 hours.", true);
     } catch (err) {
       console.error(err);
-      setMsg(
-        msg,
-        "❌ Something went wrong. Please try again or WhatsApp us.",
-        false
-      );
+      setMsg(msg, "❌ Something went wrong. Please try again or WhatsApp us.", false);
     }
   });
 }
@@ -110,26 +115,11 @@ function initReviewRotator() {
   if (!textEl || !metaEl) return;
 
   const reviews = [
-    {
-      text: "Very punctual and clean. Hedge line looks sharp and they cleaned up everything after.",
-      meta: "— Clementi",
-    },
-    {
-      text: "Fast response, clear scope before starting. No surprise charges.",
-      meta: "— Jurong West",
-    },
-    {
-      text: "Lawn was uneven before — now it looks neat and consistent. Recommended.",
-      meta: "— Bukit Timah",
-    },
-    {
-      text: "They brought proper tools and finished quickly. Site was left tidy.",
-      meta: "— Woodlands",
-    },
-    {
-      text: "Good communication and they updated me before/after. Easy to work with.",
-      meta: "— Tampines",
-    },
+    { text: "Very punctual and clean. Hedge line looks sharp and they cleaned up everything after.", meta: "— Clementi" },
+    { text: "Fast response, clear scope before starting. No surprise charges.", meta: "— Jurong West" },
+    { text: "Lawn was uneven before — now it looks neat and consistent. Recommended.", meta: "— Bukit Timah" },
+    { text: "They brought proper tools and finished quickly. Site was left tidy.", meta: "— Woodlands" },
+    { text: "Good communication and they updated me before/after. Easy to work with.", meta: "— Tampines" }
   ];
 
   let i = 0;
@@ -146,6 +136,7 @@ function initReviewRotator() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initYear();
+  initHomepageContent();   // ✅ IMPORTANT
   initLeadForm();
   initReviewRotator();
 });
