@@ -1,143 +1,118 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>UrbanLeaf Landscaping</title>
-    <meta name="description" content="Landscaping & garden maintenance in Singapore. Clean edges, controlled growth, safe handling, tidy finish." />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UrbanLeaf Landscaping</title>
 
-    <!-- Your main stylesheet -->
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+  <!-- ✅ FIX: point to the real CSS path -->
+  <link rel="stylesheet" href="/assets/styles.css?v=1" />
+</head>
 
-  <body>
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div class="container topbar__inner">
-        <a class="brand" href="index.html" aria-label="UrbanLeaf Landscaping home">
-          <div class="brand__logo">UL</div>
-          <div>
-            <span class="brand__name">UrbanLeaf Landscaping</span>
-            <span class="brand__tag">Singapore • Maintenance • Clean-up</span>
-          </div>
-        </a>
+<body>
+  <!-- Header / Nav -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="/">
+        <span class="brand__logo">UL</span>
+        <span class="brand__text">
+          <strong>UrbanLeaf Landscaping</strong>
+          <small>Singapore • Maintenance • Clean-up</small>
+        </span>
+      </a>
 
-        <nav class="nav" aria-label="Primary navigation">
-          <a class="nav__link is-active" href="index.html">Home</a>
-          <a class="nav__link" href="services.html">Services</a>
-          <a class="nav__link" href="about.html">About</a>
-        </nav>
+      <nav class="nav">
+        <a href="/" class="nav__link">Home</a>
+        <a href="/services.html" class="nav__link">Services</a>
+        <a href="/about.html" class="nav__link">About</a>
+      </nav>
 
-        <div class="topbar__cta">
-          <a class="btn btn--ghost" href="services.html">View services</a>
-          <a class="btn btn--primary" href="#quote">Get quote</a>
-        </div>
+      <div class="nav__cta">
+        <a class="btn btn--ghost" href="/services.html">View services</a>
+        <a class="btn btn--primary" href="#quote">Get quote</a>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="container hero__inner">
-        <div>
-          <div class="pill">✅ Serving Singapore • Fast response • Tidy clean-up</div>
+  <!-- Hero + Quote -->
+  <main class="hero">
+    <div class="hero__bg" aria-hidden="true"></div>
 
-          <!-- These IDs are required so Decap updates show -->
-          <h1 class="hero__title" id="heroTitle">
-            Landscaping &amp; garden maintenance that stays fresh.
-          </h1>
-
-          <p class="hero__sub" id="heroSub">
-            Clear scope, proper tools, and clean finishes. Tell us what you need — we’ll reply within 24 hours.
-          </p>
-
-          <div class="hero__actions">
-            <a class="btn btn--primary" href="#quote" id="ctaBtn">Get a free quote</a>
-            <a class="btn btn--ghost" href="tel:+6566666666">Call</a>
-            <a class="btn btn--ghost" href="https://wa.me/6566666666" target="_blank" rel="noopener">WhatsApp</a>
-          </div>
-
-          <div class="badges">
-            <span class="badge">⭐ 4.9/5 rated</span>
-            <span class="badge">🧾 Clear scope</span>
-            <span class="badge">🧰 Fully equipped</span>
-            <span class="badge">🧹 Site tidy after</span>
-          </div>
-
-          <p class="micro">Same-day site visits available for selected areas.</p>
+    <div class="hero__container">
+      <section class="hero__left">
+        <div class="pill">
+          ✅ Serving Singapore • Fast response • Tidy clean-up
         </div>
 
-        <!-- QUOTE CARD -->
-        <div class="card formCard" id="quote">
-          <h2 class="card__title">Fast Quote (1 min)</h2>
-          <p class="card__sub">We’ll reply within 24 hours.</p>
+        <!-- These IDs are what your JS replaces using /data/homepage.json -->
+        <h1 class="hero__title" id="heroTitle">Loading…</h1>
+        <p class="hero__sub" id="heroSub">Loading…</p>
 
-          <form class="form" id="leadForm">
-            <div class="field">
-              <label class="field__label" for="name">Name</label>
-              <input class="field__input" id="name" name="name" type="text" placeholder="Your name" required />
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="phone">Phone / WhatsApp</label>
-              <input class="field__input" id="phone" name="phone" type="text" placeholder="e.g., 9XXX XXXX" required />
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="location">Location (neighbourhood)</label>
-              <input class="field__input" id="location" name="location" type="text" placeholder="e.g., Jurong West" />
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="service">Service needed</label>
-              <select class="field__input" id="service" name="service">
-                <option value="">Select a service</option>
-                <option>General outdoor cleaning</option>
-                <option>Hedge trimming</option>
-                <option>Lawn mowing</option>
-                <option>Weeding</option>
-                <option>Tree pruning</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="field__label" for="notes">Notes (optional)</label>
-              <textarea class="field__input field__input--textarea" id="notes" name="notes" placeholder="Anything we should know?"></textarea>
-            </div>
-
-            <label class="check">
-              <input type="checkbox" name="consent" required />
-              I agree to be contacted about my enquiry.
-            </label>
-
-            <button class="btn btn--primary btn--full" type="submit">Request Quote</button>
-            <p class="formMsg" id="formMsg"></p>
-
-            <p class="formHint">
-              Prefer to browse first?
-              <a href="services.html">See our services catalogue →</a>
-            </p>
-          </form>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#quote" id="ctaBtn">Get a free quote</a>
+          <a class="btn btn--soft" href="tel:+65XXXXXXXX">Call</a>
+          <a class="btn btn--soft" href="https://wa.me/65XXXXXXXX" target="_blank" rel="noopener">WhatsApp</a>
         </div>
+      </section>
+
+      <section class="card" id="quote">
+        <h2 class="card__title">Fast Quote (1 min)</h2>
+        <p class="card__sub">We’ll reply within 24 hours.</p>
+
+        <form id="leadForm" class="form">
+          <label class="form__label">Name</label>
+          <input class="form__input" name="name" placeholder="Your name" required />
+
+          <label class="form__label">Phone / WhatsApp</label>
+          <input class="form__input" name="phone" placeholder="e.g., 9XXX XXXX" required />
+
+          <label class="form__label">Location (neighbourhood)</label>
+          <input class="form__input" name="location" placeholder="e.g., Jurong West" required />
+
+          <label class="form__label">Service needed</label>
+          <select class="form__input" name="service" required>
+            <option value="">Select a service</option>
+            <option>General outdoor cleaning</option>
+            <option>Hedge trimming</option>
+            <option>Weeding</option>
+            <option>Garden maintenance</option>
+          </select>
+
+          <label class="form__label">Notes (optional)</label>
+          <textarea class="form__input" name="notes" rows="4" placeholder="Anything we should know?"></textarea>
+
+          <label class="form__consent">
+            <input type="checkbox" name="consent" />
+            I agree to be contacted about my enquiry.
+          </label>
+
+          <button class="btn btn--primary btn--full" type="submit">Request Quote</button>
+
+          <div id="formMsg" class="form__msg" aria-live="polite"></div>
+        </form>
+
+        <p class="card__footer">
+          Prefer to browse first? <a href="/services.html">See our services catalogue →</a>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div>
+        <strong>UrbanLeaf Landscaping</strong><br />
+        <small>© <span id="year"></span> All rights reserved.</small>
       </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="container footer__inner">
-        <div>
-          <div class="footer__brand">UrbanLeaf Landscaping</div>
-          <div class="footer__muted">© <span id="year"></span> All rights reserved.</div>
-        </div>
-
-        <div class="footer__links">
-          <a href="services.html">Services</a>
-          <a href="about.html">About</a>
-          <a href="#quote">Get quote</a>
-        </div>
+      <div class="footer__links">
+        <a href="/services.html">Services</a>
+        <a href="/about.html">About</a>
+        <a href="#quote">Get quote</a>
       </div>
-    </footer>
+    </div>
+  </footer>
 
-    <!-- ✅ IMPORTANT: Load your JS LAST -->
-    <script src="main.js"></script>
-  </body>
+  <!-- ✅ FIX: point to the real JS path -->
+  <script src="/assets/main.js?v=1" defer></script>
+</body>
 </html>
