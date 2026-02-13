@@ -5,114 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UrbanLeaf Landscaping</title>
 
-  <!-- ✅ FIX: point to the real CSS path -->
-  <link rel="stylesheet" href="/assets/styles.css?v=1" />
+  <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 
 <body>
-  <!-- Header / Nav -->
-  <header class="topbar">
-    <div class="topbar__inner">
-      <a class="brand" href="/">
-        <span class="brand__logo">UL</span>
-        <span class="brand__text">
-          <strong>UrbanLeaf Landscaping</strong>
-          <small>Singapore • Maintenance • Clean-up</small>
-        </span>
-      </a>
 
-      <nav class="nav">
-        <a href="/" class="nav__link">Home</a>
-        <a href="/services.html" class="nav__link">Services</a>
-        <a href="/about.html" class="nav__link">About</a>
-      </nav>
+  <!-- HERO -->
+  <section class="hero">
 
-      <div class="nav__cta">
-        <a class="btn btn--ghost" href="/services.html">View services</a>
-        <a class="btn btn--primary" href="#quote">Get quote</a>
+    <div class="hero__content">
+
+      <div class="hero__pill">
+        ✅ Serving Singapore • Fast response • Tidy clean-up
       </div>
-    </div>
-  </header>
 
-  <!-- Hero + Quote -->
-  <main class="hero">
-    <div class="hero__bg" aria-hidden="true"></div>
+      <!-- ONLY change: add IDs for CMS -->
+      <h1 class="hero__title" id="heroTitle">
+        Landscaping & garden maintenance that stays fresh.
+      </h1>
 
-    <div class="hero__container">
-      <section class="hero__left">
-        <div class="pill">
-          ✅ Serving Singapore • Fast response • Tidy clean-up
-        </div>
+      <p class="hero__sub" id="heroSub">
+        Clear scope, proper tools, and clean finishes. Tell us what you need — we’ll reply within 24 hours.
+      </p>
 
-        <!-- These IDs are what your JS replaces using /data/homepage.json -->
-        <h1 class="hero__title" id="heroTitle">Loading…</h1>
-        <p class="hero__sub" id="heroSub">Loading…</p>
-
-        <div class="hero__actions">
-          <a class="btn btn--primary" href="#quote" id="ctaBtn">Get a free quote</a>
-          <a class="btn btn--soft" href="tel:+65XXXXXXXX">Call</a>
-          <a class="btn btn--soft" href="https://wa.me/65XXXXXXXX" target="_blank" rel="noopener">WhatsApp</a>
-        </div>
-      </section>
-
-      <section class="card" id="quote">
-        <h2 class="card__title">Fast Quote (1 min)</h2>
-        <p class="card__sub">We’ll reply within 24 hours.</p>
-
-        <form id="leadForm" class="form">
-          <label class="form__label">Name</label>
-          <input class="form__input" name="name" placeholder="Your name" required />
-
-          <label class="form__label">Phone / WhatsApp</label>
-          <input class="form__input" name="phone" placeholder="e.g., 9XXX XXXX" required />
-
-          <label class="form__label">Location (neighbourhood)</label>
-          <input class="form__input" name="location" placeholder="e.g., Jurong West" required />
-
-          <label class="form__label">Service needed</label>
-          <select class="form__input" name="service" required>
-            <option value="">Select a service</option>
-            <option>General outdoor cleaning</option>
-            <option>Hedge trimming</option>
-            <option>Weeding</option>
-            <option>Garden maintenance</option>
-          </select>
-
-          <label class="form__label">Notes (optional)</label>
-          <textarea class="form__input" name="notes" rows="4" placeholder="Anything we should know?"></textarea>
-
-          <label class="form__consent">
-            <input type="checkbox" name="consent" />
-            I agree to be contacted about my enquiry.
-          </label>
-
-          <button class="btn btn--primary btn--full" type="submit">Request Quote</button>
-
-          <div id="formMsg" class="form__msg" aria-live="polite"></div>
-        </form>
-
-        <p class="card__footer">
-          Prefer to browse first? <a href="/services.html">See our services catalogue →</a>
-        </p>
-      </section>
-    </div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer__inner">
-      <div>
-        <strong>UrbanLeaf Landscaping</strong><br />
-        <small>© <span id="year"></span> All rights reserved.</small>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#quote" id="ctaBtn">
+          Get a free quote
+        </a>
+        <a class="btn btn--ghost" href="#">Call</a>
+        <a class="btn btn--ghost" href="#">WhatsApp</a>
       </div>
-      <div class="footer__links">
-        <a href="/services.html">Services</a>
-        <a href="/about.html">About</a>
-        <a href="#quote">Get quote</a>
-      </div>
-    </div>
-  </footer>
 
-  <!-- ✅ FIX: point to the real JS path -->
-  <script src="/assets/main.js?v=1" defer></script>
+    </div>
+
+    <!-- QUOTE CARD -->
+    <div class="quote-card" id="quote">
+      <h2>Fast Quote (1 min)</h2>
+      <p>We’ll reply within 24 hours.</p>
+
+      <form>
+        <label>Name</label>
+        <input type="text" placeholder="Your name" />
+
+        <label>Phone / WhatsApp</label>
+        <input type="text" placeholder="e.g., 9XXX XXXX" />
+
+        <label>Location (neighbourhood)</label>
+        <input type="text" placeholder="e.g., Jurong West" />
+
+        <label>Service needed</label>
+        <select>
+          <option>Select a service</option>
+          <option>General outdoor cleaning</option>
+          <option>Hedge trimming</option>
+          <option>Weeding</option>
+          <option>Garden maintenance</option>
+        </select>
+
+        <label>Notes (optional)</label>
+        <textarea placeholder="Anything we should know?"></textarea>
+
+        <button class="btn btn--primary">Request Quote</button>
+      </form>
+
+    </div>
+
+  </section>
+
+  <script src="/assets/main.js"></script>
+
 </body>
 </html>
