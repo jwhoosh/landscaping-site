@@ -11,6 +11,8 @@ public_folder: "/assets/img/uploads"
 collections:
   - name: "homepage"
     label: "Homepage"
+    format: "json"
+    extension: "json"
     files:
       - file: "data/homepage.json"
         label: "Homepage Content"
@@ -20,10 +22,24 @@ collections:
           - { label: "Hero Subtitle", name: "hero_sub", widget: "text" }
           - { label: "CTA Button Text", name: "cta_text", widget: "string" }
 
+  - name: "about"
+    label: "About Page"
+    format: "json"
+    extension: "json"
+    files:
+      - file: "data/about.json"
+        label: "About Content"
+        name: "about"
+        fields:
+          - { label: "Our Story", name: "story", widget: "text" }
+          - { label: "Commitment", name: "commitment", widget: "text" }
+
   - name: "services"
     label: "Services"
     folder: "data/services"
     create: true
+    format: "json"
+    extension: "json"
     slug: "{{slug}}"
     fields:
       - { label: "Service Title", name: "title", widget: "string" }
@@ -34,17 +50,9 @@ collections:
     label: "Reviews"
     folder: "data/reviews"
     create: true
+    format: "json"
+    extension: "json"
     slug: "{{slug}}"
     fields:
       - { label: "Review Text", name: "text", widget: "text" }
       - { label: "Location", name: "location", widget: "string" }
-
-  - name: "about"
-    label: "About Page"
-    files:
-      - file: "data/about.json"
-        label: "About Content"
-        name: "about"
-        fields:
-          - { label: "Our Story", name: "story", widget: "text" }
-          - { label: "Commitment", name: "commitment", widget: "text" }
