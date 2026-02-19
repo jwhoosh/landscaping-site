@@ -1,34 +1,10 @@
 {
   "services": [
-    {
-      "slug": "lawn-mowing",
-      "title": "Lawn mowing & edging",
-      "desc": "Clean cut, tidy edges, and full clean-up after."
-    },
-    {
-      "slug": "hedge-trimming",
-      "title": "Hedge trimming & shaping",
-      "desc": "Straight lines, neat shaping, and disposal included."
-    },
-    {
-      "slug": "weeding",
-      "title": "Weeding & soil conditioning",
-      "desc": "Remove weeds properly and improve soil health."
-    },
-    {
-      "slug": "tree-pruning",
-      "title": "Tree pruning & branch removal",
-      "desc": "Safer growth, reduced overhang, and cleaner canopy."
-    },
-    {
-      "slug": "garden-cleanup",
-      "title": "Garden clean-up (one-time)",
-      "desc": "Clear overgrowth, bag waste, restore neatness."
-    },
-    {
-      "slug": "pest-prevention",
-      "title": "Plant care & pest prevention",
-      "desc": "Basic care plan + tips to keep plants thriving."
-    }
+    { "slug": "lawn-mowing", "title": "Lawn mowing & edging", "desc": "Clean cut, tidy edges, full clean-up after." },
+    { "slug": "hedge-trimming", "title": "Hedge trimming & shaping", "desc": "Straight lines, neat shaping, disposal included." },
+    { "slug": "weeding", "title": "Weeding & soil conditioning", "desc": "Remove weeds properly and improve soil health." },
+    { "slug": "tree-pruning", "title": "Tree pruning & branch removal", "desc": "Safer growth, reduced overhang, cleaner canopy." },
+    { "slug": "garden-cleanup", "title": "Garden clean-up (one-time)", "desc": "Clear overgrowth, bag waste, restore neatness." },
+    { "slug": "maintenance", "title": "Monthly maintenance plan", "desc": "Regular visits to keep your landscape neat year-round." }
   ]
 }
