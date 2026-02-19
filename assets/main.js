@@ -1,103 +1,191 @@
-window.addEventListener("error", (e) => {
-  console.error("Global error:", e.error || e.message);
-});
-window.addEventListener("unhandledrejection", (e) => {
-  console.error("Unhandled promise:", e.reason);
-});
+/* =========================================================
+   UrbanLeaf Landscaping - main.js
+   - Loads homepage content from /data/homepage.json
+   - Loads services from /data/services/index.json
+   - Loads about content from /data/about.json (optional)
+   ========================================================= */
 
-// ✅ Your Apps Script Web App URL
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwPpHZYDCjZBQNKSisGfjNkv6u0hTU7QW5XQyPGFoZcOWyCOSx3AdfJ19-4KGXLTELO/exec";
-
-function qs(sel) { return document.querySelector(sel); }
-
-function setMsg(el, text, ok = true) {
-  if (!el) return;
-  el.textContent = text;
-  el.classList.remove("ok", "err");
-  el.classList.add(ok ? "ok" : "err");
+function $(sel, root = document) {
+  return root.querySelector(sel);
+}
+function $all(sel, root = document) {
+  return Array.from(root.querySelectorAll(sel));
 }
 
-async function loadHomepageContentFromDecap() {
+function isPath(pathname, target) {
+  // supports /services and /services/ etc.
+  const p = pathname.replace(/\/+$/, "");
+  const t = target.replace(/\/+$/, "");
+  return p === t;
+}
+
+async function fetchJSON(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed ${url}: ${res.status}`);
+  return res.json();
+}
+
+/* ---------------------------
+   Homepage loader
+----------------------------*/
+async function loadHomepage() {
+  // Only run if the page actually has hero elements
+  const heroTitle = $("#heroTitle");
+  const heroSub = $("#heroSub");
+  const ctaBtn = $("#ctaBtn");
+
+  if (!heroTitle && !heroSub && !ctaBtn) return;
+
   try {
-    // Decap writes to this file
-    const res = await fetch("/data/homepage.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("homepage.json not found");
-    const data = await res.json();
+    const data = await fetchJSON("/data/homepage.json");
 
-    // Your Decap fields (from config.yml): hero_title, hero_sub, cta_text
-    const heroTitle = qs("#heroTitle");
-    const heroSub = qs("#heroSub");
-    const ctaBtn = qs("#ctaBtn");
-
-    if (heroTitle && data.hero_title) heroTitle.textContent = data.hero_title;
-    if (heroSub && data.hero_sub) heroSub.textContent = data.hero_sub;
-    if (ctaBtn && data["cta_text"]) ctaBtn.textContent = data["cta_text"];
+    if (heroTitle && typeof data.hero_title === "string") {
+      heroTitle.textContent = data.hero_title;
+    }
+    if (heroSub && typeof data.hero_sub === "string") {
+      heroSub.textContent = data.hero_sub;
+    }
+    if (ctaBtn && typeof data.cta_text === "string") {
+      ctaBtn.textContent = data.cta_text;
+    }
   } catch (e) {
-    // If this fails, page will fall back to the hardcoded HTML text.
-    console.warn("Decap homepage content not applied:", e);
+    console.error("Homepage load error:", e);
   }
 }
 
-function initYear() {
-  const y = qs("#year");
-  if (y) y.textContent = new Date().getFullYear();
+/* ---------------------------
+   Services index loader
+   Required file: /data/services/index.json
+
+   Expected shape:
+   {
+     "services": [
+       { "slug": "hedge-trimming", "title": "Hedge trimming" },
+       ...
+     ]
+   }
+----------------------------*/
+async function loadServicesIndex() {
+  const data = await fetchJSON("/data/services/index.json");
+  const items = Array.isArray(data.services) ? data.services : [];
+  // normalize
+  return items
+    .map((s) => ({
+      slug: String(s.slug || "").trim(),
+      title: String(s.title || "").trim(),
+    }))
+    .filter((s) => s.slug && s.title);
 }
 
-function initLeadForm() {
-  const form = qs("#leadForm");
-  const msg = qs("#formMsg");
-  if (!form) return;
+/* ---------------------------
+   Populate dropdown on Home form
+   Needs <select id="serviceSelect"> in your HTML
+----------------------------*/
+async function populateServiceDropdown() {
+  const sel = $("#serviceSelect");
+  if (!sel) return;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  try {
+    const services = await loadServicesIndex();
 
-    const fd = new FormData(form);
-    const data = Object.fromEntries(fd.entries());
-    data.consent = form.querySelector('input[name="consent"]')?.checked === true;
+    sel.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = "Select a service";
+    sel.appendChild(opt0);
 
-    if (!data.consent) {
-      setMsg(msg, "Please tick consent to proceed.", false);
+    for (const s of services) {
+      const opt = document.createElement("option");
+      opt.value = s.slug;
+      opt.textContent = s.title;
+      sel.appendChild(opt);
+    }
+  } catch (e) {
+    console.error("Dropdown load error:", e);
+    // Keep a safe fallback option
+    sel.innerHTML = `<option value="">Select a service</option>`;
+  }
+}
+
+/* ---------------------------
+   Render Services page list
+   Needs <div id="servicesList"></div> in services page HTML
+----------------------------*/
+async function renderServicesPage() {
+  const container = $("#servicesList");
+  if (!container) return;
+
+  try {
+    const services = await loadServicesIndex();
+
+    if (services.length === 0) {
+      container.innerHTML = `<p class="muted">No services found yet.</p>`;
       return;
     }
 
-    setMsg(msg, "Sending…", true);
-
-    try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name || "",
-          phone: data.phone || "",
-          location: data.location || "",
-          service: data.service || "",
-          notes: data.notes || ""
-        })
-      });
-
-      const txt = await res.text();
-      let ok = false;
-      try {
-        const j = JSON.parse(txt);
-        ok = j && j.success === true;
-      } catch (_) {
-        ok = res.ok;
-      }
-
-      if (!ok) throw new Error("Server did not confirm success.");
-
-      form.reset();
-      setMsg(msg, "✅ Request sent. We’ll contact you within 24 hours.", true);
-    } catch (err) {
-      console.error(err);
-      setMsg(msg, "❌ Something went wrong. Please try again or WhatsApp us.", false);
-    }
-  });
+    // Simple card grid (works with your existing CSS classes)
+    container.innerHTML = `
+      <div class="grid3">
+        ${services
+          .map(
+            (s) => `
+            <article class="card serviceCard">
+              <div class="serviceCard__body">
+                <h3>${escapeHTML(s.title)}</h3>
+                <p class="muted">Tap to view details</p>
+                <a class="link" href="/services.html#${encodeURIComponent(
+                  s.slug
+                )}">View</a>
+              </div>
+            </article>
+          `
+          )
+          .join("")}
+      </div>
+    `;
+  } catch (e) {
+    console.error("Services page render error:", e);
+    container.innerHTML = `<p class="muted">Could not load services.</p>`;
+  }
 }
 
+function escapeHTML(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/* ---------------------------
+   Nav active state
+----------------------------*/
+function setActiveNav() {
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  $all(".nav__link").forEach((a) => a.classList.remove("is-active"));
+
+  // match by href
+  const candidates = $all(".nav__link");
+  const hit =
+    candidates.find((a) => isPath(path, (a.getAttribute("href") || "").trim())) ||
+    candidates.find((a) => a.getAttribute("href") === "/" && path === "/");
+
+  if (hit) hit.classList.add("is-active");
+}
+
+/* ---------------------------
+   Boot
+----------------------------*/
 document.addEventListener("DOMContentLoaded", async () => {
-  initYear();
-  await loadHomepageContentFromDecap(); // ✅ this is the key missing piece
-  initLeadForm();
+  setActiveNav();
+
+  // Always attempt homepage content if elements exist
+  await loadHomepage();
+
+  // Populate dropdown if it exists (Home page)
+  await populateServiceDropdown();
+
+  // Render services list if container exists (Services page)
+  await renderServicesPage();
 });
