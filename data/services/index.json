@@ -3,36 +3,3 @@
     { "slug": "hedge-trimming", "title": "Hedge trimming" }
   ]
 }
-async function loadServicesIndex() {
-  const res = await fetch("/data/services/index.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Missing /data/services/index.json");
-  return res.json();
-}
-
-async function populateServiceDropdown(selectEl) {
-  try {
-    const data = await loadServicesIndex();
-    const items = (data.services || []).filter(s => s && s.slug && s.title);
-
-    // Clear existing
-    selectEl.innerHTML = "";
-
-    // Placeholder
-    const opt0 = document.createElement("option");
-    opt0.value = "";
-    opt0.textContent = "Select a service";
-    selectEl.appendChild(opt0);
-
-    // Items
-    for (const s of items) {
-      const opt = document.createElement("option");
-      opt.value = s.slug;
-      opt.textContent = s.title;
-      selectEl.appendChild(opt);
-    }
-  } catch (e) {
-    console.error(e);
-    // Fallback so the site still usable
-    selectEl.innerHTML = `<option value="">Select a service</option>`;
-  }
-}
