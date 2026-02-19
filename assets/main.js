@@ -1,3 +1,10 @@
+window.addEventListener("error", (e) => {
+  console.error("Global error:", e.error || e.message);
+});
+window.addEventListener("unhandledrejection", (e) => {
+  console.error("Unhandled promise:", e.reason);
+});
+
 // ✅ Your Apps Script Web App URL
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwPpHZYDCjZBQNKSisGfjNkv6u0hTU7QW5XQyPGFoZcOWyCOSx3AdfJ19-4KGXLTELO/exec";
