@@ -1,5 +1,14 @@
-// assets/main.js
+// assets/main.js  (FULL WORKING VERSION)
+// - Loads services options from /data/services/index.json
+// - Populates dropdown (#serviceSelect)
+// - Renders Services page (#servicesList)
+// - Submits quote form (#quoteForm) to Google Apps Script
+// - Shows status message (#formMsg)
+
 (() => {
+  const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbwPpHZYDCjZBQNKSisGfjNkv6u0hTU7QW5XQyPGFoZcOWyCOSx3AdfJ19-4KGXLTELO/exec";
+
   const $ = (sel, root = document) => root.querySelector(sel);
 
   async function fetchJSON(url) {
@@ -9,7 +18,8 @@
   }
 
   function escapeHtml(str) {
-    return (str ?? "").toString()
+    return (str ?? "")
+      .toString()
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
@@ -17,26 +27,14 @@
       .replaceAll("'", "&#039;");
   }
 
-  // -------- Load homepage content (optional) ----------
-  async function loadHomepageContent() {
-    const heroTitle = $("#heroTitle");
-    const heroSub = $("#heroSub");
-    const ctaBtn = $("#ctaBtn");
-
-    // If these elements don't exist on the page, skip silently
-    if (!heroTitle && !heroSub && !ctaBtn) return;
-
-    try {
-      const data = await fetchJSON("/data/homepage.json");
-      if (heroTitle && data.hero_title) heroTitle.textContent = data.hero_title;
-      if (heroSub && data.hero_sub) heroSub.textContent = data.hero_sub;
-      if (ctaBtn && data.cta_text) ctaBtn.textContent = data.cta_text;
-    } catch (e) {
-      console.warn("homepage.json not applied (ok if you don't use CMS yet).");
-    }
+  function setMsg(el, text, ok = true) {
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove("ok", "err");
+    el.classList.add(ok ? "ok" : "err");
   }
 
-  // -------- Services: load from index.json ----------
+  // ---------------- Services ----------------
   async function loadServices() {
     const data = await fetchJSON("/data/services/index.json");
     const services = Array.isArray(data.services) ? data.services : [];
@@ -44,18 +42,15 @@
       .map((s) => ({
         slug: (s.slug ?? "").toString().trim(),
         title: (s.title ?? "").toString().trim(),
-        desc: (s.desc ?? "").toString().trim()
+        desc: (s.desc ?? "").toString().trim(),
       }))
       .filter((s) => s.slug && s.title);
   }
 
-  // -------- Dropdown on Home page ----------
   async function populateServiceDropdown(services) {
-    // IMPORTANT: your homepage select must use id="serviceSelect"
     const sel = document.getElementById("serviceSelect");
     if (!sel) return;
 
-    // reset options
     sel.innerHTML = "";
 
     const opt0 = document.createElement("option");
@@ -65,45 +60,109 @@
 
     for (const s of services) {
       const opt = document.createElement("option");
-      opt.value = s.title;          // what user sees/what gets submitted
+      opt.value = s.title;      // what gets submitted
       opt.textContent = s.title;
       sel.appendChild(opt);
     }
   }
 
-  // -------- Services page cards ----------
   function renderServicesPage(services) {
     const list = document.getElementById("servicesList");
     if (!list) return;
 
     if (!services.length) {
-      list.innerHTML = `<div class="card serviceCard"><div class="serviceCard__body">
-        <h3>No services found</h3>
-        <p class="muted">Please check <code>/data/services/index.json</code>.</p>
-      </div></div>`;
+      list.innerHTML = `
+        <div class="card serviceCard">
+          <div class="serviceCard__body">
+            <h3>No services found</h3>
+            <p class="muted">Check /data/services/index.json</p>
+          </div>
+        </div>
+      `;
       return;
     }
 
-    list.innerHTML = services.map((s) => `
+    list.innerHTML = services
+      .map(
+        (s) => `
       <div class="card serviceCard" id="${escapeHtml(s.slug)}">
         <div class="serviceCard__body">
           <h3>${escapeHtml(s.title)}</h3>
-          <p>${escapeHtml(s.desc || "Tell us what you need and we’ll confirm scope.")}</p>
-          <a class="link" href="/#quote">Request a quote →</a>
+          <p>${escapeHtml(
+            s.desc || "Tell us what you need and we’ll confirm scope."
+          )}</p>
+          <a class="link" href="/#quote">Request quote →</a>
         </div>
       </div>
-    `).join("");
+    `
+      )
+      .join("");
   }
 
-  // -------- Boot ----------
+  // ---------------- Form submit ----------------
+  function initQuoteForm() {
+    const form = document.getElementById("quoteForm");
+    const msg = document.getElementById("formMsg");
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fd = new FormData(form);
+      const data = Object.fromEntries(fd.entries());
+
+      // If you have a consent checkbox, enforce it (optional)
+      const consentEl = form.querySelector('input[type="checkbox"]');
+      if (consentEl && consentEl.checked !== true) {
+        setMsg(msg, "Please tick consent to proceed.", false);
+        return;
+      }
+
+      setMsg(msg, "Sending…", true);
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.name || "",
+            phone: data.phone || "",
+            location: data.location || "",
+            service: data.service || "",
+            notes: data.notes || "",
+          }),
+        });
+
+        // Apps Script sometimes returns text; try parse
+        const txt = await res.text();
+        let ok = false;
+        try {
+          const j = JSON.parse(txt);
+          ok = j && j.success === true;
+        } catch (_) {
+          ok = res.ok; // fallback
+        }
+
+        if (!ok) throw new Error("Server did not confirm success.");
+
+        form.reset();
+        setMsg(msg, "✅ Request sent. We’ll contact you within 24 hours.", true);
+      } catch (err) {
+        console.error(err);
+        setMsg(msg, "❌ Submission failed. Please try again.", false);
+      }
+    });
+  }
+
+  // ---------------- Boot ----------------
   async function boot() {
-    await loadHomepageContent();
+    initQuoteForm();
 
     let services = [];
     try {
       services = await loadServices();
     } catch (e) {
-      console.error("Failed loading services index:", e);
+      console.error("Failed loading services:", e);
     }
 
     populateServiceDropdown(services);
