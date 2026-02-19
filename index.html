@@ -4,29 +4,166 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>UrbanLeaf Landscaping</title>
-
-    <!-- ✅ IMPORTANT: correct CSS path -->
-    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/styles.css?v=1" />
   </head>
 
   <body>
-    <!-- ===== YOUR EXISTING PAGE HTML GOES HERE =====
-         Keep your existing layout/sections.
-         The only key thing: ensure these IDs exist somewhere in your hero:
-         heroTitle, heroSub, ctaBtn
-    -->
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <a class="brand" href="/">
+          <span class="brand__logo">UL</span>
+          <span>
+            <span class="brand__name">UrbanLeaf Landscaping</span>
+            <span class="brand__tag">Singapore • Maintenance • Clean-up</span>
+          </span>
+        </a>
 
-    <h1 class="hero__title" id="heroTitle">
-      Landscaping &amp; garden maintenance that stays fresh.
-    </h1>
+        <nav class="nav" aria-label="Primary">
+          <a class="nav__link is-active" href="/">Home</a>
+          <a class="nav__link" href="/services.html">Services</a>
+          <a class="nav__link" href="/about.html">About</a>
+        </nav>
 
-    <p class="hero__sub" id="heroSub">
-      Clear scope, proper tools, and clean finishes. Tell us what you need — we’ll reply within 24 hours.
-    </p>
+        <div class="topbar__cta">
+          <a class="btn btn--ghost" href="/services.html">View services</a>
+          <a class="btn btn--primary" href="#quote">Get quote</a>
+        </div>
+      </div>
+    </header>
 
-    <a class="btn btn--primary" href="#quote" id="ctaBtn">Get a free quote</a>
+    <!-- Hero -->
+    <main>
+      <section class="hero">
+        <div class="container hero__inner">
+          <!-- Left -->
+          <div>
+            <div class="pill">✅ Serving Singapore • Fast response • Tidy clean-up</div>
 
-    <!-- ✅ IMPORTANT: correct JS path -->
-    <script src="/assets/main.js" defer></script>
+            <h1 class="hero__title" id="heroTitle">
+              Landscaping &amp; garden maintenance that stays fresh.
+            </h1>
+
+            <p class="hero__sub" id="heroSub">
+              Clear scope, proper tools, and clean finishes. Tell us what you need — we’ll reply within 24 hours.
+            </p>
+
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#quote" id="ctaBtn">Get a free quote</a>
+              <a class="btn btn--ghost" href="tel:+65XXXXXXXX" id="callBtn">Call</a>
+              <a class="btn btn--ghost" href="https://wa.me/65XXXXXXXX" target="_blank" rel="noopener" id="waBtn">WhatsApp</a>
+            </div>
+
+            <div class="badges">
+              <span class="badge">⭐ 4.9/5 rated</span>
+              <span class="badge">🧾 Clear scope</span>
+              <span class="badge">🧰 Fully equipped</span>
+              <span class="badge">🧹 Site tidy after</span>
+            </div>
+
+            <p class="micro">Same-day site visits available for selected areas.</p>
+          </div>
+
+          <!-- Right: Quote card -->
+          <aside class="card formCard" id="quote">
+            <h2 class="card__title">Fast Quote (1 min)</h2>
+            <p class="card__sub">We’ll reply within 24 hours.</p>
+
+            <form class="form" id="quoteForm">
+              <label class="field">
+                <span class="field__label">Name</span>
+                <input class="field__input" name="name" placeholder="Your name" required />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Phone / WhatsApp</span>
+                <input class="field__input" name="phone" placeholder="e.g., 9XXX XXXX" required />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Location (neighbourhood)</span>
+                <input class="field__input" name="location" placeholder="e.g., Jurong West" required />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Service needed</span>
+                <select class="field__input" name="service" id="serviceSelect" required>
+                  <option value="">Select a service</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span class="field__label">Notes (optional)</span>
+                <textarea class="field__input field__input--textarea" name="notes" placeholder="Anything we should know?"></textarea>
+              </label>
+
+              <label class="check">
+                <input type="checkbox" required />
+                <span>I agree to be contacted about my enquiry.</span>
+              </label>
+
+              <button class="btn btn--primary btn--full" type="submit">Request Quote</button>
+              <p class="formMsg" id="formMsg" aria-live="polite"></p>
+
+              <p class="formHint">
+                Prefer to browse first? <a href="/services.html">See our services catalogue →</a>
+              </p>
+            </form>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Services preview -->
+      <section class="section">
+        <div class="container">
+          <div class="section__head">
+            <div>
+              <h2 class="section__title">Popular services</h2>
+              <p class="section__sub">A few common requests — tap to see the full catalogue.</p>
+            </div>
+            <a class="btn btn--ghost" href="/services.html">View all</a>
+          </div>
+
+          <div class="grid3" id="servicesPreview"></div>
+        </div>
+      </section>
+
+      <!-- Reviews -->
+      <section class="section section--tint">
+        <div class="container">
+          <div class="card reviewsCard">
+            <div class="reviewsCard__row">
+              <div>
+                <div class="reviewsCard__stars">★★★★★</div>
+                <div class="reviewsCard__source">Google Reviews</div>
+              </div>
+              <div class="reviewsCard__actions">
+                <button class="btn btn--ghost" type="button" id="prevReview">Prev</button>
+                <button class="btn btn--ghost" type="button" id="nextReview">Next</button>
+              </div>
+            </div>
+
+            <p class="reviewRotator__text" id="reviewText">“Quick and professional.”</p>
+            <p class="reviewRotator__meta" id="reviewMeta">— Singapore</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div>
+          <div class="footer__brand">UrbanLeaf Landscaping</div>
+          <div class="footer__muted">© All rights reserved.</div>
+        </div>
+        <div class="footer__links">
+          <a href="/services.html">Services</a>
+          <a href="/about.html">About</a>
+          <a href="#quote">Get quote</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/main.js?v=1" defer></script>
   </body>
 </html>
