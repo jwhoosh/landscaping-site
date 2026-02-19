@@ -1,94 +1,63 @@
-/* =========================================================
-   UrbanLeaf Landscaping - main.js
-   - Loads homepage content from /data/homepage.json
-   - Loads services from /data/services/index.json
-   - Loads about content from /data/about.json (optional)
-   ========================================================= */
+// assets/main.js
+(() => {
+  const $ = (sel, root = document) => root.querySelector(sel);
 
-function $(sel, root = document) {
-  return root.querySelector(sel);
-}
-function $all(sel, root = document) {
-  return Array.from(root.querySelectorAll(sel));
-}
-
-function isPath(pathname, target) {
-  // supports /services and /services/ etc.
-  const p = pathname.replace(/\/+$/, "");
-  const t = target.replace(/\/+$/, "");
-  return p === t;
-}
-
-async function fetchJSON(url) {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed ${url}: ${res.status}`);
-  return res.json();
-}
-
-/* ---------------------------
-   Homepage loader
-----------------------------*/
-async function loadHomepage() {
-  // Only run if the page actually has hero elements
-  const heroTitle = $("#heroTitle");
-  const heroSub = $("#heroSub");
-  const ctaBtn = $("#ctaBtn");
-
-  if (!heroTitle && !heroSub && !ctaBtn) return;
-
-  try {
-    const data = await fetchJSON("/data/homepage.json");
-
-    if (heroTitle && typeof data.hero_title === "string") {
-      heroTitle.textContent = data.hero_title;
-    }
-    if (heroSub && typeof data.hero_sub === "string") {
-      heroSub.textContent = data.hero_sub;
-    }
-    if (ctaBtn && typeof data.cta_text === "string") {
-      ctaBtn.textContent = data.cta_text;
-    }
-  } catch (e) {
-    console.error("Homepage load error:", e);
+  async function fetchJSON(url) {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`${url} -> ${res.status}`);
+    return res.json();
   }
-}
 
-/* ---------------------------
-   Services index loader
-   Required file: /data/services/index.json
+  function escapeHtml(str) {
+    return (str ?? "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-   Expected shape:
-   {
-     "services": [
-       { "slug": "hedge-trimming", "title": "Hedge trimming" },
-       ...
-     ]
-   }
-----------------------------*/
-async function loadServicesIndex() {
-  const data = await fetchJSON("/data/services/index.json");
-  const items = Array.isArray(data.services) ? data.services : [];
-  // normalize
-  return items
-    .map((s) => ({
-      slug: String(s.slug || "").trim(),
-      title: String(s.title || "").trim(),
-    }))
-    .filter((s) => s.slug && s.title);
-}
+  // -------- Load homepage content (optional) ----------
+  async function loadHomepageContent() {
+    const heroTitle = $("#heroTitle");
+    const heroSub = $("#heroSub");
+    const ctaBtn = $("#ctaBtn");
 
-/* ---------------------------
-   Populate dropdown on Home form
-   Needs <select id="serviceSelect"> in your HTML
-----------------------------*/
-async function populateServiceDropdown() {
-  const sel = $("#serviceSelect");
-  if (!sel) return;
+    // If these elements don't exist on the page, skip silently
+    if (!heroTitle && !heroSub && !ctaBtn) return;
 
-  try {
-    const services = await loadServicesIndex();
+    try {
+      const data = await fetchJSON("/data/homepage.json");
+      if (heroTitle && data.hero_title) heroTitle.textContent = data.hero_title;
+      if (heroSub && data.hero_sub) heroSub.textContent = data.hero_sub;
+      if (ctaBtn && data.cta_text) ctaBtn.textContent = data.cta_text;
+    } catch (e) {
+      console.warn("homepage.json not applied (ok if you don't use CMS yet).");
+    }
+  }
 
+  // -------- Services: load from index.json ----------
+  async function loadServices() {
+    const data = await fetchJSON("/data/services/index.json");
+    const services = Array.isArray(data.services) ? data.services : [];
+    return services
+      .map((s) => ({
+        slug: (s.slug ?? "").toString().trim(),
+        title: (s.title ?? "").toString().trim(),
+        desc: (s.desc ?? "").toString().trim()
+      }))
+      .filter((s) => s.slug && s.title);
+  }
+
+  // -------- Dropdown on Home page ----------
+  async function populateServiceDropdown(services) {
+    // IMPORTANT: your homepage select must use id="serviceSelect"
+    const sel = document.getElementById("serviceSelect");
+    if (!sel) return;
+
+    // reset options
     sel.innerHTML = "";
+
     const opt0 = document.createElement("option");
     opt0.value = "";
     opt0.textContent = "Select a service";
@@ -96,96 +65,54 @@ async function populateServiceDropdown() {
 
     for (const s of services) {
       const opt = document.createElement("option");
-      opt.value = s.slug;
+      opt.value = s.title;          // what user sees/what gets submitted
       opt.textContent = s.title;
       sel.appendChild(opt);
     }
-  } catch (e) {
-    console.error("Dropdown load error:", e);
-    // Keep a safe fallback option
-    sel.innerHTML = `<option value="">Select a service</option>`;
   }
-}
 
-/* ---------------------------
-   Render Services page list
-   Needs <div id="servicesList"></div> in services page HTML
-----------------------------*/
-async function renderServicesPage() {
-  const container = $("#servicesList");
-  if (!container) return;
+  // -------- Services page cards ----------
+  function renderServicesPage(services) {
+    const list = document.getElementById("servicesList");
+    if (!list) return;
 
-  try {
-    const services = await loadServicesIndex();
-
-    if (services.length === 0) {
-      container.innerHTML = `<p class="muted">No services found yet.</p>`;
+    if (!services.length) {
+      list.innerHTML = `<div class="card serviceCard"><div class="serviceCard__body">
+        <h3>No services found</h3>
+        <p class="muted">Please check <code>/data/services/index.json</code>.</p>
+      </div></div>`;
       return;
     }
 
-    // Simple card grid (works with your existing CSS classes)
-    container.innerHTML = `
-      <div class="grid3">
-        ${services
-          .map(
-            (s) => `
-            <article class="card serviceCard">
-              <div class="serviceCard__body">
-                <h3>${escapeHTML(s.title)}</h3>
-                <p class="muted">Tap to view details</p>
-                <a class="link" href="/services.html#${encodeURIComponent(
-                  s.slug
-                )}">View</a>
-              </div>
-            </article>
-          `
-          )
-          .join("")}
+    list.innerHTML = services.map((s) => `
+      <div class="card serviceCard" id="${escapeHtml(s.slug)}">
+        <div class="serviceCard__body">
+          <h3>${escapeHtml(s.title)}</h3>
+          <p>${escapeHtml(s.desc || "Tell us what you need and we’ll confirm scope.")}</p>
+          <a class="link" href="/#quote">Request a quote →</a>
+        </div>
       </div>
-    `;
-  } catch (e) {
-    console.error("Services page render error:", e);
-    container.innerHTML = `<p class="muted">Could not load services.</p>`;
+    `).join("");
   }
-}
 
-function escapeHTML(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+  // -------- Boot ----------
+  async function boot() {
+    await loadHomepageContent();
 
-/* ---------------------------
-   Nav active state
-----------------------------*/
-function setActiveNav() {
-  const path = location.pathname.replace(/\/+$/, "") || "/";
-  $all(".nav__link").forEach((a) => a.classList.remove("is-active"));
+    let services = [];
+    try {
+      services = await loadServices();
+    } catch (e) {
+      console.error("Failed loading services index:", e);
+    }
 
-  // match by href
-  const candidates = $all(".nav__link");
-  const hit =
-    candidates.find((a) => isPath(path, (a.getAttribute("href") || "").trim())) ||
-    candidates.find((a) => a.getAttribute("href") === "/" && path === "/");
+    populateServiceDropdown(services);
+    renderServicesPage(services);
+  }
 
-  if (hit) hit.classList.add("is-active");
-}
-
-/* ---------------------------
-   Boot
-----------------------------*/
-document.addEventListener("DOMContentLoaded", async () => {
-  setActiveNav();
-
-  // Always attempt homepage content if elements exist
-  await loadHomepage();
-
-  // Populate dropdown if it exists (Home page)
-  await populateServiceDropdown();
-
-  // Render services list if container exists (Services page)
-  await renderServicesPage();
-});
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
